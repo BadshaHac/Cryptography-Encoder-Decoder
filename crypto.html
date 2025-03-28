@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Encoder & Decoder</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #0a0a0a;
+            color: #33ff33;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 2px solid #33ff33;
+            border-radius: 10px;
+            background-color: #111;
+            box-shadow: 0px 0px 10px #33ff33;
+        }
+        textarea, select, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #33ff33;
+            color: #0a0a0a;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #28cc28;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Cryptography Encoder & Decoder</h1>
+        
+        <label for="cipherMethod">Select Cipher Method:</label>
+        <select id="cipherMethod">
+            <option value="caesar">Caesar Cipher</option>
+            <option value="base64">Base64</option>
+            <option value="aes">AES Encryption</option>
+            <option value="md5">MD5 Hash</option>
+            <option value="sha256">SHA-256 Hash</option>
+        </select>
+
+        <label for="inputText">Enter Text:</label>
+        <textarea id="inputText" rows="4"></textarea>
+
+        <button onclick="encode()">Encode</button>
+        <button onclick="decode()">Decode</button>
+
+        <label for="outputText">Output:</label>
+        <textarea id="outputText" rows="4" readonly></textarea>
+    </div>
+
+    <script>
+        function encode() {
+            let text = document.getElementById("inputText").value;
+            let method = document.getElementById("cipherMethod").value;
+            let output = "";
+
+            if (method === "caesar") {
+                output = caesarCipher(text, 3);
+            } else if (method === "base64") {
+                output = btoa(text);
+            } else if (method === "aes") {
+                output = aesEncrypt(text);
+            } else if (method === "md5") {
+                output = md5Hash(text);
+            } else if (method === "sha256") {
+                output = sha256Hash(text);
+            }
+
+            document.getElementById("outputText").value = output;
+        }
+
+        function decode() {
+            let text = document.getElementById("inputText").value;
+            let method = document.getElementById("cipherMethod").value;
+            let output = "";
+
+            if (method === "caesar") {
+                output = caesarCipher(text, -3);
+            } else if (method === "base64") {
+                output = atob(text);
+            } else if (method === "aes") {
+                output = aesDecrypt(text);
+            } else if (method === "md5" || method === "sha256") {
+                output = "Decryption not available for hashing algorithms like MD5 and SHA-256. Because they are one-way hashing.";
+            } else {
+                output = "Invalid decryption method.";
+            }
+
+            document.getElementById("outputText").value = output;
+        }
+
+        // Caesar Cipher
+        function caesarCipher(str, shift) {
+            return str.split('').map(char => {
+                let code = char.charCodeAt(0);
+                if (code >= 65 && code <= 90) {
+                    return String.fromCharCode(((code - 65 + shift + 26) % 26) + 65);
+                } else if (code >= 97 && code <= 122) {
+                    return String.fromCharCode(((code - 97 + shift + 26) % 26) + 97);
+                }
+                return char;
+            }).join('');
+        }
+
+        // AES Encryption
+        function aesEncrypt(text) {
+            let passphrase = "secret-key"; // Change this for better security
+            return CryptoJS.AES.encrypt(text, passphrase).toString();
+        }
+
+        // AES Decryption
+        function aesDecrypt(encryptedText) {
+            let passphrase = "secret-key";
+            let bytes = CryptoJS.AES.decrypt(encryptedText, passphrase);
+            return bytes.toString(CryptoJS.enc.Utf8) || "Decryption failed";
+        }
+
+        // MD5 Hashing (One-way, cannot be decrypted)
+        function md5Hash(text) {
+            return CryptoJS.MD5(text).toString();
+        }
+
+        // SHA-256 Hashing (One-way, cannot be decrypted)
+        function sha256Hash(text) {
+            return CryptoJS.SHA256(text).toString();
+        }
+    </script>
+</body>
+</html>
